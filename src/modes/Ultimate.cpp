@@ -21,12 +21,13 @@ void Ultimate::UpdateDigitalOutputs(InputState &inputs, OutputState &outputs) {
     outputs.x = inputs.x;
     outputs.y = inputs.y;
     outputs.buttonL = inputs.lightshield;
-    outputs.buttonR = inputs.z || inputs.midshield;
+    outputs.buttonR = inputs.z;
     outputs.triggerLDigital = inputs.l;
     outputs.triggerRDigital = inputs.r;
     outputs.start = inputs.start;
     outputs.select = inputs.select;
     outputs.home = inputs.home;
+    outputs.dpadUp = inputs.midshield;
 
     // Turn on D-Pad layer by holding Mod X + Mod Y or Nunchuk C button.
     if ((inputs.mod_x && inputs.mod_y) || inputs.nunchuk_c) {
@@ -55,8 +56,13 @@ void Ultimate::UpdateAnalogOutputs(InputState &inputs, OutputState &outputs) {
     );
 
     bool shield_button_pressed = inputs.l || inputs.r;
+    bool jump_button_pressed = inputs.x || inputs.y;
 
     if (inputs.mod_x) {
+        if (jump_button_pressed) {
+            outputs.x = true;
+            outputs.y = true;
+        }
         // MX + Horizontal = 6625 = 53
         if (directions.horizontal) {
             outputs.leftStickX = 128 + (directions.x * 53);
@@ -89,10 +95,10 @@ void Ultimate::UpdateAnalogOutputs(InputState &inputs, OutputState &outputs) {
         }
 
         // Angled fsmash/ftilt with C-Stick + MX
-        if (directions.cx != 0) {
-            outputs.rightStickX = 128 + (directions.cx * 127);
-            outputs.rightStickY = 128 + (directions.y * 59);
-        }
+        // if (directions.cs != 0) {
+        //    outputs.rightStickX = 128 + (directions.cx * 127);
+        //    outputs.rightStickY = 128 + (directions.cy * 59);
+        //}
 
         /* Up B angles */
         if (directions.diagonal && !shield_button_pressed) {
@@ -156,6 +162,10 @@ void Ultimate::UpdateAnalogOutputs(InputState &inputs, OutputState &outputs) {
     }
 
     if (inputs.mod_y) {
+        if (jump_button_pressed) {
+            outputs.x = true;
+            outputs.y = true;
+        }
         // MY + Horizontal (even if shield is held) = 41
         if (directions.horizontal) {
             outputs.leftStickX = 128 + (directions.x * 41);
@@ -200,7 +210,7 @@ void Ultimate::UpdateAnalogOutputs(InputState &inputs, OutputState &outputs) {
             }
             // (53.65) = 39 53
             if (inputs.c_left) {
-                outputs.leftStickX = 128 + (directions.x * 49);
+                outputs.leftStickX = 128 + (directions.x * 39);
                 outputs.leftStickY = 128 + (directions.y * 53);
             }
             // (59.68) = 31 53
@@ -266,14 +276,8 @@ void Ultimate::UpdateAnalogOutputs(InputState &inputs, OutputState &outputs) {
     }
 
     // Shut off C-stick when using D-Pad layer.
-    if ((inputs.mod_x && inputs.mod_y) || inputs.nunchuk_c) {
+    if (inputs.mod_x && inputs.mod_y) {
         outputs.rightStickX = 128;
         outputs.rightStickY = 128;
-    }
-
-    // Nunchuk overrides left stick.
-    if (inputs.nunchuk_connected) {
-        outputs.leftStickX = inputs.nunchuk_x;
-        outputs.leftStickY = inputs.nunchuk_y;
     }
 }
