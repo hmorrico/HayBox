@@ -156,7 +156,7 @@ void Ultimate::UpdateAnalogOutputs(InputState &inputs, OutputState &outputs) {
             // Angled Ftilts
             if (inputs.a) {
                 outputs.leftStickX = 128 + (directions.x * 36);
-                outputs.leftStickY = 128 + (directions.y * 26);
+                outputs.leftStickY = 128 + (directions.y * 36);
             }
         }
     }
